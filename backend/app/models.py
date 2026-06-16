@@ -28,6 +28,8 @@ class Aircraft(Base):
         nullable=False
     )
 
+    # Relationship to the Flight model - allows access to the associated flights for this aircraft
+    flights = relationship("Flight", back_populates="aircraft")
 
 class Flight(Base):
     # Table name
@@ -66,6 +68,12 @@ class Flight(Base):
     # Relationship to the Aircraft model - allows access to the associated aircraft object
     aircraft = relationship("Aircraft", back_populates="flights") 
 
+    # Relationship to the TelemetryRecord model - allows access to the associated telemetry records for this flight
+    telemetry_records = relationship(
+        "TelemetryRecord",
+        back_populates="flight",    
+    )
+
 
 class TelemetryRecord(Base):
     # Table name
@@ -89,10 +97,7 @@ class TelemetryRecord(Base):
     flight_phase = Column(String, nullable=False)  # Flight phase (e.g., "takeoff", "cruise", "landing")
 
     # Relationships
-    telemetry_records = relationship(
-        "TelemetryRecord",
-        back_populates="flight",    
-    )
+    
 
     flight = relationship(
         "Flight",
