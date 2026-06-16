@@ -1,7 +1,9 @@
 from fastapi import FastAPI, HTTPException
 
 # TEST ======
-from app.database import engine
+from app.database import Base, engine
+import app.models
+
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -10,6 +12,10 @@ app = FastAPI(
     description="API for managing flight telemetry data and related operations.",
     version="1.0.0",
 )
+
+
+
+Base.metadata.create_all(bind=engine)  # Create tables in the database if they don't exist
 
 
 @app.get("/")
