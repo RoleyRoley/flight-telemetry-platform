@@ -1,0 +1,15 @@
+# Environment and secret files
+.env
+.env.*
+*.env
+
+# Keep template env files committed
+!*.env.example
+
+# Python virtual environments
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]

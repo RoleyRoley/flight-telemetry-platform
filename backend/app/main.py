@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 
-app = FastAPI()
+app = FastAPI(
+    title="Flight Telemetry Platform API",
+    description="API for managing flight telemetry data and related operations.",
+)
 
 
 @app.get("/health")
@@ -8,6 +11,3 @@ def health_check():
     return {"status": "healthy"}
 
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str | None = None):
-    return {"item_id": item_id, "q": q}
