@@ -58,9 +58,9 @@ class Flight(Base):
     arrival_airport = Column(String, nullable=False)
 
     # Scheduled departure time (e.g., "2024-06-01T10:00:00Z") - ISO 8601 format
-    scheduled_departure_time = Column(String, nullable=False)
+    scheduled_departure_time = Column(DateTime, nullable=False)
     # Scheduled arrival time (e.g., "2024-06-01T14:00:00Z") - ISO 8601 format
-    scheduled_arrival_time = Column(String, nullable=True)
+    scheduled_arrival_time = Column(DateTime, nullable=True)
 
     # Flight status (e.g., "scheduled", "in-flight", "landed")
     status = Column(String, default="scheduled") 
