@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException
 # TEST ======
 from app.database import Base, engine
 import app.models
+from app.routes.telemetry import router as telemetry_router
 
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
@@ -16,7 +17,7 @@ app = FastAPI(
 
 
 Base.metadata.create_all(bind=engine)  # Create tables in the database if they don't exist
-
+app.include_router(telemetry_router)  
 
 @app.get("/")
 def root():
@@ -25,7 +26,11 @@ def root():
         "docs": "/docs",
         "health": "/health",
         "details": "/details",
+        "database test": "/db-test",
+        "telemetry check": "/telemetry"
     }
+
+
 
 
 @app.get("/health")
