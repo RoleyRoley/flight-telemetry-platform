@@ -44,22 +44,45 @@ def create_telemetry(
     # Detect alerts based on the new telemetry record
     generated_alerts = detect_alerts(new_record)
 
+    created_alerts = 0
+
     for alert_data in generated_alerts:
+
+        exisiting_alert = (
+            db.query(Alert)
+            .filter(
+                Alert.flight_id == new_record.flight_id,
+                Alert.alert_type == alert_data["alert_type"]
+            )
+            .first()
+        )
+
+        if exisiting_alert:
+            continue
+
+
+
+
+
         alert = Alert(
             flight_id=new_record.flight_id,
             telemetry_record_id=new_record.id,
             timestamp=new_record.timestamp,
+            alert_type=alert_data["alert_type"],
             severity=alert_data["severity"],
             message=alert_data["message"]
         )
         db.add(alert)
 
+        created_alerts += 1
+
     # Commit the alerts to the database if any were generated
-    if generated_alerts:
+    if created_alerts > 0:
         db.commit()
 
     return {
         "message": "Telemetry record created successfully.",
         "record_id": new_record.id,
-        "alerts_generated": len(generated_alerts)   
+        "alerts_generated": len(generated_alerts),   
+        "alerts_created": created_alerts
         }

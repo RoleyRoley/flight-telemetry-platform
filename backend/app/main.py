@@ -5,6 +5,7 @@ from app.database import Base, engine
 import app.models
 from app.routes.telemetry import router as telemetry_router
 from app.routes.alerts import router as alerts_router
+from app.routes.flights import router as flights_router
 
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
@@ -18,8 +19,11 @@ app = FastAPI(
 
 
 Base.metadata.create_all(bind=engine)  # Create tables in the database if they don't exist
+
+# include routers for different endpoints
 app.include_router(telemetry_router)  
 app.include_router(alerts_router)
+app.include_router(flights_router)
 
 @app.get("/")
 def root():

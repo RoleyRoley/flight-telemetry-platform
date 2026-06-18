@@ -137,6 +137,7 @@ class Alert(Base):
 
     timestamp = Column(DateTime, nullable=False)  # Timestamp of the alert
 
+    alert_type = Column(String, nullable=False)  # Type of alert (e.g., "engine_overheat", "fuel_leak", "rapid_altitude_loss")
     severity = Column(String, nullable=False)  # Severity of the alert (e.g., "low", "medium", "high")
     message = Column(String, nullable=False)  # Alert message 
 

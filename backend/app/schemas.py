@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 
 # Schema for creating telemetry data
 class TelemetryCreate(BaseModel):
@@ -26,3 +27,26 @@ class AlertResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+# Schema for Flight Summary response data
+class FlightSummaryResponse(BaseModel):
+    flight_id: int
+    flight_number: str
+
+    departure_airport: str
+    arrival_airport: str
+    status: str
+
+    duration_seconds: Optional[float]
+    telemetry_records: int
+
+    max_altitude_ft: Optional[float]
+    max_ground_speed_kts: Optional[float]
+    fuel_used_percentage: Optional[float]
+    highest_engine_temp_c: Optional[float]
+
+    alerts_generated: int
+    outcome: str
+    
+
+    

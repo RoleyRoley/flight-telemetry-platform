@@ -22,14 +22,17 @@ def send_telemetry(data):
         # Check the response status code
         # 200 indicates success, while other codes indicate failure
         if response.status_code == 200:
+
+            result = response.json()
+
             print(
                 f"{data['flight_phase'].upper()} | "
                 f"Alt {data['altitude_ft']:.0f} ft | "
                 f"Speed: {data['ground_speed_kts']:.0f} kts | "
                 f"Fuel: {data['fuel_percentage']:.1f}% | "
-                f"Engine Temp: {data['engine_temp_c']:.1f}°C"
-
-
+                f"Engine Temp: {data['engine_temp_c']:.1f}°C | "
+                f"Alerts Generated: {result['alerts_generated']} | "
+                f"Alerts Created: {result['alerts_created']}"
             )
 
 
