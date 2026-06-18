@@ -74,6 +74,11 @@ class Flight(Base):
         back_populates="flight",    
     )
 
+    alerts = relationship(
+        "Alert",
+        back_populates="flight",
+    )
+
 
 class TelemetryRecord(Base):
     # Table name
@@ -103,3 +108,42 @@ class TelemetryRecord(Base):
         "Flight",
         back_populates="telemetry_records",
     )
+
+    alerts = relationship(
+        "Alert",
+        back_populates="telemetry_record",
+    )
+
+
+class Alert(Base):
+    # Table name
+    __tablename__ = "alerts"
+
+    # Columns
+    id = Column(Integer, primary_key=True, index=True)
+
+    # Foreign key to the Flight table - links the alert to a specific flight
+    flight_id = Column(
+        Integer,
+        ForeignKey("flights.id"),
+        nullable=False
+    )
+
+    telemetry_record_id = Column(
+        Integer,
+        ForeignKey("telemetry_records.id"),
+        nullable=False
+    )
+
+    timestamp = Column(DateTime, nullable=False)  # Timestamp of the alert
+
+    severity = Column(String, nullable=False)  # Severity of the alert (e.g., "low", "medium", "high")
+    message = Column(String, nullable=False)  # Alert message 
+
+    flight = relationship("Flight", back_populates="alerts")  # Relationship to the Flight model
+    telemetry_record = relationship("TelemetryRecord", back_populates="alerts")  # Relationship to the TelemetryRecord model
+
+
+
+
+    
