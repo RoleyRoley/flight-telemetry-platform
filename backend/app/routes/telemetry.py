@@ -54,6 +54,7 @@ def create_telemetry(
         )
         db.add(alert)
 
+    # Commit the alerts to the database if any were generated
     if generated_alerts:
         db.commit()
 
