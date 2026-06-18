@@ -58,6 +58,7 @@ def run_simulatior():
         # Simulate telemetry data
         elapsed_seconds = time.time() - start_time
 
+        # TAXI 
         if elapsed_seconds< 20:
             flight_phase = "taxi"
 
@@ -66,6 +67,7 @@ def run_simulatior():
             engine_temp_c += random.uniform(1, 3)
             fuel_percentage -= random.uniform(0.01, 0.03)
 
+        # TAKEOFF
         elif elapsed_seconds < 40:
             flight_phase = "takeoff"
 
@@ -74,6 +76,7 @@ def run_simulatior():
             engine_temp_c += random.uniform(3, 6)
             fuel_percentage -= random.uniform(0.05, 0.09)
 
+        # CLIMB
         elif altitude_ft < 35000 and elapsed_seconds < 140:
             flight_phase = "climb"
 
@@ -82,6 +85,7 @@ def run_simulatior():
             engine_temp_c += random.uniform(-1, 2)
             fuel_percentage -= random.uniform(0.03, 0.06)
 
+        # CRUISE
         elif elapsed_seconds < 220:
             flight_phase = "cruise"
 
@@ -90,6 +94,7 @@ def run_simulatior():
             engine_temp_c = 720 + random.uniform(-10, 10)
             fuel_percentage -= random.uniform(0.02, 0.04)
 
+        # DESCENT
         elif altitude_ft > 0:
             flight_phase = "descent"
 
@@ -103,7 +108,8 @@ def run_simulatior():
 
             if ground_speed_kts < 0:
                 ground_speed_kts = 0
-    
+
+        # LANDING
         else:
                 flight_phase = "landed"
 
@@ -123,7 +129,8 @@ def run_simulatior():
                 send_telemetry(telemetry)
                 print("Flight simulation complete.")
                 break
-                
+        
+        # Create telemetry data dictionary
         telemetry = {
             "flight_id": FLIGHT_ID,
             "timestamp": datetime.utcnow().isoformat(),
@@ -132,12 +139,13 @@ def run_simulatior():
             "ground_speed_kts": ground_speed_kts,
             "fuel_percentage": fuel_percentage,
             "engine_temp_c": engine_temp_c
-
+        
         }
         
+        # Send telemetry data to the API
         send_telemetry(telemetry)
         
-        time.sleep(5)  # Send telemetry data every 5 seconds
+        time.sleep(1)  # Send telemetry data every second
 
 
 if __name__ == "__main__":

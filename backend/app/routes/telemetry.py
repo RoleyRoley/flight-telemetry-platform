@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import TelemetryRecord
+from app.models import TelemetryRecord, Alert
+from app.services.anomaly_detector import detect_alerts
 from app.schemas import TelemetryCreate
 
 router = APIRouter(
@@ -39,7 +40,25 @@ def create_telemetry(
     db.commit()
     db.refresh(new_record)
 
-    # Return the created telemetry record's ID
+    
+    # Detect alerts based on the new telemetry record
+    generated_alerts = detect_alerts(new_record)
+
+    for alert_data in generated_alerts:
+        alert = Alert(
+            flight_id=new_record.flight_id,
+            telemetry_record_id=new_record.id,
+            timestamp=new_record.timestamp,
+            severity=alert_data["severity"],
+            message=alert_data["message"]
+        )
+        db.add(alert)
+
+    if generated_alerts:
+        db.commit()
+
     return {
         "message": "Telemetry record created successfully.",
-        "record_id": new_record.id    }
+        "record_id": new_record.id,
+        "alerts_generated": len(generated_alerts)   
+        }
