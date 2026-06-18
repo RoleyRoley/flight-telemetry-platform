@@ -37,5 +37,11 @@ def detect_alerts(telemetry_record):
             "severity": "warning",
             "message": "Altitude exceeds expected operating range."
         })
+
+    if telemetry_record.flight_phase == "crashed":
+        alerts.append({
+            "severity": "critical",
+            "message": "Aircraft impact detected following active fault."
+        })
     
     return alerts
