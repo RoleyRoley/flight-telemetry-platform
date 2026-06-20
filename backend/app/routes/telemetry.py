@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import TelemetryRecord, Alert
+from app.models import TelemetryRecord, Alert, Flight
 from app.services.anomaly_detector import detect_alerts
 from app.schemas import TelemetryCreate
 
@@ -39,6 +39,25 @@ def create_telemetry(
     db.add(new_record)
     db.commit()
     db.refresh(new_record)
+    
+    
+    flight = (
+    db.query(Flight)
+    .filter(Flight.id == new_record.flight_id)
+    .first()
+    )
+
+    if flight:
+        if new_record.flight_phase in ["taxi", "takeoff", "climb", "cruise", "descent", "emergency_descent"]:
+            flight.status = "in_flight"
+
+        elif new_record.flight_phase == "landed":
+            flight.status = "landed"
+
+        elif new_record.flight_phase == "crashed":
+            flight.status = "crashed"
+
+        db.commit()
 
     
     # Detect alerts based on the new telemetry record
