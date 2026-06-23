@@ -1,10 +1,11 @@
 import time
 import random
 import requests
+import os
 from datetime import datetime
 
 # Constants
-API_URL = "http://127.0.0.1:8000/telemetry/"
+API_URL = os.getenv("API_URL", "http://127.0.0.1:8000/telemetry/")
 
 FLIGHT_ID = 1
 
