@@ -28,7 +28,10 @@ The Flight Telemetry Platform provides a production-ready API for managing fligh
 
 ```
 flight-telemetry-platform/
+├── docker-compose.yml               # Docker orchestration (backend + optional simulator)
 ├── backend/                          # FastAPI application
+│   ├── Dockerfile                   # Backend container image
+│   ├── .dockerignore                # Backend Docker build exclusions
 │   ├── app/
 │   │   ├── main.py                  # FastAPI app initialization
 │   │   ├── database.py              # SQLAlchemy setup & session management
@@ -45,6 +48,8 @@ flight-telemetry-platform/
 │   └── seed.py                      # Database seeding script
 │
 └── simulator/                       # Flight telemetry simulator
+   ├── Dockerfile                   # Simulator container image
+   ├── .dockerignore                # Simulator Docker build exclusions
     └── simulator.py                 # Synthetic telemetry data generator
 ```
 
@@ -52,6 +57,7 @@ flight-telemetry-platform/
 
 - **Python 3.8+**
 - **PostgreSQL 12+**
+- **Docker Desktop** (for containerized run)
 - **pip** or virtual environment manager
 - Git for version control
 
@@ -133,6 +139,65 @@ python simulator.py
 ```
 
 The simulator will generate telemetry data and send it to the API at 1-second intervals.
+
+## 🐳 Docker Setup (Using Existing PostgreSQL + PGAdmin)
+
+This project is configured so Docker runs the API (and optionally the simulator), while your PostgreSQL database remains external.
+
+That means:
+- You keep your current PostgreSQL instance.
+- You keep using PGAdmin exactly as you do now.
+- Docker does not create or replace your database.
+
+### 1. Keep using your existing backend `.env`
+
+Use your current `backend/.env` with your normal PostgreSQL connection string, for example with host `localhost`.
+
+The backend container automatically maps `localhost` to the host machine when running in Docker.
+
+### 2. Start backend in Docker
+
+From the project root:
+
+```bash
+docker compose up --build backend
+```
+
+API endpoints:
+- `http://localhost:8000/health`
+- `http://localhost:8000/docs`
+
+### 3. (Optional) Start simulator in Docker too
+
+```bash
+docker compose --profile simulator up --build
+```
+
+By default, Docker Compose runs the backend with access logs disabled so simulator output stays readable.
+Backend warnings and errors are still shown.
+
+If you want to watch only simulator output:
+
+```bash
+docker compose logs -f simulator
+```
+
+If you want to watch only backend output:
+
+```bash
+docker compose logs -f backend
+```
+
+### 4. Stop containers
+
+```bash
+docker compose down
+```
+
+### PGAdmin Notes
+
+- Continue connecting PGAdmin to your existing DB host/port (usually `localhost:5432`), same as before.
+- Data inserted via Dockerized backend appears in the same database because the app connects to your existing PostgreSQL.
 
 ## 📡 API Documentation
 

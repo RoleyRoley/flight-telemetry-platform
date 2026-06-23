@@ -1,0 +1,33 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: flight-telemetry-backend
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--no-access-log", "--log-level", "warning"]
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      RUNNING_IN_DOCKER: "true"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  simulator:
+    build:
+      context: ./simulator
+    container_name: flight-telemetry-simulator
+    environment:
+      API_URL: "http://backend:8000/telemetry/"
+    depends_on:
+      backend:
+        condition: service_healthy
+    profiles:
+      - simulator
+    restart: unless-stopped
