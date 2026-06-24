@@ -83,7 +83,7 @@ def get_flight_summary(
     else:
         outcome = "incomplete"
 
-    # 
+    # Return the flight summary response
     return FlightSummaryResponse(
         flight_id=flight.id,
         flight_number=flight.flight_number,
