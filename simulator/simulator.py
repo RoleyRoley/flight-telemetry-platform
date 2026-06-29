@@ -3,15 +3,23 @@ import random
 import requests
 import os
 from datetime import datetime
+from geopy.distance import geodesic
 
 # Constants
 API_URL = os.getenv("API_URL", "http://127.0.0.1:8000/telemetry/")
 
+SIM_INTERVAL = 0.5  # seconds between telemetry data points
+
 FLIGHT_ID = 1
 
-FAULT_CHANCE = 0.10  # 10% chance to trigger a fault
+FAULT_CHANCE = None  # 10% chance to trigger a fault
+FORCED_FAULT = None  # Set to "engine_overheat", "fuel_leak", or "rapid_altitude_loss" to force a specific fault
 
-FORCED_FAULT = "rapid_altitude_loss"  # Set to "engine_overheat", "fuel_leak", or "rapid_altitude_loss" to force a specific fault
+# Coordinates for the flight path simulation
+START_COORDINATES = (51.4700, -0.4543)  # EGLL Heathrow coordinates
+END_COORDINATES = (52.3105, 4.7683)  # EHAM Amsterdam coordinates
+
+HEADING_DEG = 82
 
 
 
@@ -33,7 +41,8 @@ def send_telemetry(data):
                 f"Fuel: {data['fuel_percentage']:.1f}% | "
                 f"Engine Temp: {data['engine_temp_c']:.1f}°C | "
                 f"Alerts Generated: {result['alerts_generated']} | "
-                f"Alerts Created: {result['alerts_created']}"
+                f"Alerts Created: {result['alerts_created']} |"
+                f"Route Progress: {data['route_progress_percentage']:.1f}%"
             )
 
 
@@ -49,6 +58,8 @@ def send_telemetry(data):
 
 # Function to run the telemetry simulator
 def run_simulator():
+    
+    route_progress = 0.0  # Progress along the route (0.0 to 1.0)
 
     altitude_ft = 0
     ground_speed_kts = 0
@@ -139,8 +150,30 @@ def run_simulator():
                 send_telemetry(telemetry)
                 print("Flight simulation complete.")
                 break
+            
+        if flight_phase == "taxi":
+            route_progress = 0.0
+        elif flight_phase == "takeoff":
+            route_progress += 0.002
+        elif flight_phase == "climb":
+            route_progress += 0.006
+        elif flight_phase == "cruise":
+            route_progress += 0.008
+        elif flight_phase in ["descent", "emergency_descent"]:
+            route_progress += 0.006
+        elif flight_phase == "landed":
+            route_progress = 1.0
+            
+        route_progress = min(route_progress, 1.0)  # Ensure it doesn't exceed 1.0
+        route_progress_percentage = route_progress * 100  # Convert to percentage for display
+        
+        latitude = START_COORDINATES[0] + (END_COORDINATES[0] - START_COORDINATES[0]) * route_progress
+        longitude = START_COORDINATES[1] + (END_COORDINATES[1] - START_COORDINATES[1]) * route_progress
+        heading_deg = HEADING_DEG  # Keep heading constant for simplicity
+            
                 
-        if not fault_triggered and flight_phase in ["climb", "cruise"]:
+        # Disable all fault injection (including forced faults) when FAULT_CHANCE is None.
+        if FAULT_CHANCE is not None and not fault_triggered and flight_phase in ["climb", "cruise"]:
 
             if FORCED_FAULT is not None:
                 active_fault = FORCED_FAULT
@@ -190,16 +223,7 @@ def run_simulator():
             ground_speed_kts = 0
 
         
-        if flight_phase == "crashed":
-            telemetry = {
-                "flight_id": FLIGHT_ID,
-                "timestamp": datetime.utcnow().isoformat(),
-                "flight_phase": flight_phase,
-                "altitude_ft": altitude_ft,
-                "ground_speed_kts": ground_speed_kts,
-                "fuel_percentage": fuel_percentage,
-                "engine_temp_c": engine_temp_c  
-            }
+        
 
         # Create telemetry data dictionary
         telemetry = {
@@ -209,14 +233,17 @@ def run_simulator():
             "altitude_ft": altitude_ft,
             "ground_speed_kts": ground_speed_kts,
             "fuel_percentage": fuel_percentage,
-            "engine_temp_c": engine_temp_c
-        
+            "engine_temp_c": engine_temp_c,
+            "latitude": latitude,
+            "longitude": longitude,
+            "heading_deg": heading_deg,
+            "route_progress_percentage": route_progress_percentage
         }
         
         # Send telemetry data to the API
         send_telemetry(telemetry)
         
-        time.sleep(1)  # Send telemetry data every second
+        time.sleep(SIM_INTERVAL)  # Send telemetry data every second
 
 
 if __name__ == "__main__":

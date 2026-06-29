@@ -15,6 +15,15 @@ class TelemetryCreate(BaseModel):
     engine_temp_c: float
 
     flight_phase: str  
+    
+    
+    latitude: float
+    longitude: float
+    heading_deg: float
+    
+    route_progress_percentage: float  # Route progress as a percentage (0.0 to 100.0)
+    
+    
 
 # Schema for Alert response data
 class AlertResponse(BaseModel):

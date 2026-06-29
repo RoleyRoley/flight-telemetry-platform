@@ -32,7 +32,11 @@ def create_telemetry(
         ground_speed_kts=telemetry.ground_speed_kts,
         fuel_percentage=telemetry.fuel_percentage,
         engine_temp_c=telemetry.engine_temp_c,
-        flight_phase=telemetry.flight_phase
+        flight_phase=telemetry.flight_phase,
+        latitude=telemetry.latitude,
+        longitude=telemetry.longitude,
+        heading_deg=telemetry.heading_deg,
+        route_progress_percentage=telemetry.route_progress_percentage
     )
 
     # Add the new telemetry record to the database
