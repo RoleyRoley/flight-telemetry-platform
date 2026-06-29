@@ -100,6 +100,12 @@ class TelemetryRecord(Base):
     fuel_percentage = Column(Float, nullable=False)  # Fuel percentage remaining
     engine_temp_c = Column(Float, nullable=False)  # Engine temperature in Celsius
     flight_phase = Column(String, nullable=False)  # Flight phase (e.g., "takeoff", "cruise", "landing")
+    
+    latitude = Column(Float, nullable=False)  # Latitude of the aircraft
+    longitude = Column(Float, nullable=False)  # Longitude of the aircraft
+    heading_deg = Column(Float, nullable=False)  # Heading of the aircraft in degrees
+    
+    route_progress_percentage = Column(Float, nullable=True)  # Route progress as a percentage (0.0 to 100.0)
 
     # Relationships
     
