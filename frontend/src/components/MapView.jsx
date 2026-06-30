@@ -14,6 +14,36 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
+
+const planeIcons = {
+  normal: L.icon({
+    iconUrl: "/icons/Plane_Green.svg",
+    iconSize: [200, 200],
+    iconAnchor: [100, 100],
+  }),
+
+  warning: L.icon({
+    iconUrl: "/icons/Plane_Orange.svg",
+    iconSize: [200, 200],
+    iconAnchor: [100, 100],
+  }),
+
+  emergency: L.icon({
+    iconUrl: "/icons/Plane_Red.svg",
+    iconSize: [200, 200],
+    iconAnchor: [100, 100],
+  }),
+
+  crashed: L.icon({
+    iconUrl: "/icons/Plane_Black.svg",
+    iconSize: [200, 200],
+    iconAnchor: [100, 100],
+  }),
+};
+
+
+
+
 export default function MapView() {
     const [telemetry, setTelemetry] = useState(null);
 
@@ -38,6 +68,28 @@ export default function MapView() {
             ? [telemetry.latitude, telemetry.longitude]
             : [51.4700, -0.4543];
 
+
+    function getPlaneIcon(telemetry) {
+        if (!telemetry) return planeIcons.normal;
+
+        if (telemetry.flight_phase === "crashed") {
+          return planeIcons.crashed;
+        }
+
+        if (telemetry.flight_phase === "emergency_descent") {
+          return planeIcons.emergency;
+        }
+
+        if (telemetry.flight_phase === "descent") {
+          return planeIcons.warning;
+        }
+
+        return planeIcons.normal;
+      }
+
+      const planeIcon = getPlaneIcon(telemetry);
+
+
     return (
 
     // Render the map with the latest telemetry data
@@ -49,7 +101,7 @@ export default function MapView() {
         />
 
         {telemetry && (
-          <Marker position={position}>
+          <Marker position={position} icon={planeIcon}>
             <Popup>
               <strong>Flight ID:</strong> {telemetry.flight_id}
               <br />

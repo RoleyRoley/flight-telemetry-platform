@@ -12,8 +12,8 @@ SIM_INTERVAL = 0.5  # seconds between telemetry data points
 
 FLIGHT_ID = 1
 
-FAULT_CHANCE = None  # 10% chance to trigger a fault
-FORCED_FAULT = None  # Set to "engine_overheat", "fuel_leak", or "rapid_altitude_loss" to force a specific fault
+FAULT_CHANCE = 0.10  # 10% chance to trigger a fault
+FORCED_FAULT = "rapid_altitude_loss"  # Set to "engine_overheat", "fuel_leak", or "rapid_altitude_loss" to force a specific fault
 
 # Coordinates for the flight path simulation
 START_COORDINATES = (51.4700, -0.4543)  # EGLL Heathrow coordinates
