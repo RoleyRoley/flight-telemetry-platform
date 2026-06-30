@@ -109,3 +109,17 @@ def create_telemetry(
         "alerts_generated": len(generated_alerts),   
         "alerts_created": created_alerts
         }
+
+# Get the latest telemetry record
+@router.get("/latest")
+def get_latest_telemetry(db: Session = Depends(get_db)):
+    latest = (
+        db.query(TelemetryRecord)
+        .order_by(TelemetryRecord.timestamp.desc())
+        .first()
+    )
+    
+    if latest is None:
+        return None
+    
+    return latest
