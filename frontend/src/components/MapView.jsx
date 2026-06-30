@@ -1,14 +1,29 @@
-import {useEffect, useState} from "react";
-import {MapContainer, TileLayer, Marker, Popup} from "react-leaflet";
+import { useEffect, useState } from "react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+
+import L from "leaflet";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
 
 export default function MapView() {
     const [telemetry, setTelemetry] = useState(null);
 
     useEffect(() => {
         async function fetchLatestTelemetry() {
-            const response = await fetch('http://localhost:8000/api/telemetry/latest');
+            const response = await fetch('http://localhost:8000/telemetry/latest');
             const data = await response.json();
             setTelemetry(data);
+            // Log the latest telemetry data to the console for debugging
+            console.log("Latest telemetry:", data);
         }
 
         fetchLatestTelemetry();
@@ -18,7 +33,10 @@ export default function MapView() {
         return () => clearInterval(interval); // Cleanup on unmount
     }, []);
 
-    const position = telemetry ? [telemetry.latitude, telemetry.longitude] : [51.4700, -0.4543];
+    const position =
+        telemetry?.latitude && telemetry?.longitude
+            ? [telemetry.latitude, telemetry.longitude]
+            : [51.4700, -0.4543];
 
     return (
 
